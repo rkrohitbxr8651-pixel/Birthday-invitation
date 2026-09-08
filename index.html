@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>You're Invited 💌</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #ff758c, #ff7eb3, #8e44ad);
+      color: white;
+      overflow-x: hidden;
+    }
+
+    /* ================= OPENING SCREEN ================= */
+
+    .opening {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background: linear-gradient(135deg, #ff758c, #8e44ad);
+      transition: opacity 1s ease, visibility 1s ease;
+    }
+
+    .opening.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .opening h2 {
+      font-size: clamp(1.8rem, 7vw, 3rem);
+      margin-bottom: 35px;
+      text-align: center;
+      animation: fadeDown 1s ease;
+    }
+
+    /* Envelope */
+
+    .envelope {
+      width: 220px;
+      height: 145px;
+      position: relative;
+      cursor: pointer;
+      animation: float 2s ease-in-out infinite;
+    }
+
+    .envelope-body {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+    }
+
+    .envelope-body::before,
+    .envelope-body::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      z-index: 3;
+    }
+
+    .envelope-body::before {
+      left: 0;
+      border-width: 0 0 145px 110px;
+      border-color: transparent transparent #f5d8e4 transparent;
+    }
+
+    .envelope-body::after {
+      right: 0;
+      border-width: 145px 0 0 110px;
+      border-color: transparent transparent transparent #edc5d7;
+    }
+
+    .flap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 0;
+      border-left: 110px solid transparent;
+      border-right: 110px solid transparent;
+      border-top: 80px solid #f8dce8;
+      transform-origin: top;
+      transition: transform 0.8s ease;
+      z-index: 5;
+    }
+
+    .heart {
+      position: absolute;
+      z-index: 10;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 40px;
+      transition: 0.5s;
+    }
+
+    .open-text {
+      margin-top: 35px;
+      padding: 14px 28px;
+      border-radius: 50px;
+      background: white;
+      color: #8e44ad;
+      font-weight: bold;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      animation: pulse 1.5s infinite;
+    }
+
+    .opening.opened .flap {
+      transform: rotateX(180deg);
+    }
+
+    .opening.opened .heart {
+      transform: translate(-50%, -100px) scale(1.4);
+      opacity: 0;
+    }
+
+    /* ================= MAIN INVITATION ================= */
+
+    .main {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      opacity: 0;
+      transform: scale(0.9);
+      transition: 1s ease;
+    }
+
+    .main.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .invite-card {
+      width: 100%;
+      max-width: 500px;
+      padding: 40px 25px;
+      text-align: center;
+
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 30px;
+
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    }
+
+    .icon {
+      font-size: 65px;
+      animation: bounce 2s infinite;
+      margin-bottom: 15px;
+    }
+
+    .small-title {
+      font-size: 14px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: clamp(2.5rem, 10vw, 4rem);
+      margin-bottom: 10px;
+      text-shadow: 0 4px 15px rgba(0,0,0,0.25);
+    }
+
+    .event-name {
+      color: #fff200;
+    }
+
+    .message {
+      margin: 20px auto;
+      line-height: 1.7;
+      font-size: 1rem;
+      max-width: 400px;
+    }
+
+    .details {
+      margin: 25px 0;
+      padding: 20px;
+      border-radius: 20px;
+      background: rgba(0,0,0,0.15);
+    }
+
+    .detail {
+      margin: 12px 0;
+      font-size: 1rem;
+    }
+
+    .detail span {
+      font-size: 1.3rem;
+      margin-right: 8px;
+    }
+
+    .btn {
+      border: none;
+      background: white;
+      color: #8e44ad;
+      padding: 14px 28px;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      transform: scale(1.06);
+    }
+
+    #response {
+      margin-top: 18px;
+      font-weight: bold;
+      color: #fff200;
+      min-height: 25px;
+    }
+
+    /* ================= CONFETTI ================= */
+
+    .confetti {
+      position: fixed;
+      top: -20px;
+      z-index: 200;
+      pointer-events: none;
+      animation: fall linear forwards;
+    }
+
+    /* ================= ANIMATIONS ================= */
+
+    @keyframes fall {
+      to {
+        transform: translateY(110vh) rotate(720deg);
+        opacity: 0.8;
+      }
+    }
+
+    @keyframes float {
+      0%,100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-12px);
+      }
+    }
+
+    @keyframes bounce {
+      0%,100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-12px);
+      }
+    }
+
+    @keyframes pulse {
+      0%,100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.06);
+      }
+    }
+
+    @keyframes fadeDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ================= MOBILE ================= */
+
+    @media (max-width: 480px) {
+
+      .opening h2 {
+        padding: 0 20px;
+      }
+
+      .envelope {
+        width: 190px;
+        height: 125px;
+      }
+
+      .flap {
+        border-left-width: 95px;
+        border-right-width: 95px;
+        border-top-width: 70px;
+      }
+
+      .envelope-body::before {
+        border-width: 0 0 125px 95px;
+      }
+
+      .envelope-body::after {
+        border-width: 125px 0 0 95px;
+      }
+
+      .invite-card {
+        padding: 30px 18px;
+        border-radius: 25px;
+      }
+
+      h1 {
+        font-size: 2.5rem;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <!-- ================= OPENING SCREEN ================= -->
+
+  <section class="opening" id="opening">
+
+```
+<h2>You've Got An Invitation 💌</h2>
+
+<div class="envelope" onclick="openInvitation()">
+
+  <div class="envelope-body"></div>
+
+  <div class="flap"></div>
+
+  <div class="heart">💖</div>
+
+</div>
+
+<div class="open-text">
+  Tap to Open ✨
+</div>
+```
+
+  </section>
+
+  <!-- ================= MAIN INVITATION ================= -->
+
+  <main class="main" id="main">
+
+```
+<div class="invite-card">
+
+  <div class="icon">🎉</div>
+
+  <div class="small-title">
+    You Are Invited
+  </div>
+
+  <h1>
+    <span class="event-name">Birthday</span> Party!
+  </h1>
+
+  <p class="message">
+    Come celebrate an amazing day with us!
+    Your presence will make the celebration
+    even more special. 💖
+  </p>
+
+  <div class="details">
+
+    <div class="detail">
+      <span>📅</span>
+      <strong>20 September 2026</strong>
+    </div>
+
+    <div class="detail">
+      <span>⏰</span>
+      <strong>6:00 PM</strong>
+    </div>
+
+    <div class="detail">
+      <span>📍</span>
+      <strong>Dream Garden, Patna</strong>
+    </div>
+
+  </div>
+
+  <button class="btn" onclick="acceptInvitation()">
+    🎁 Accept Invitation
+  </button>
+
+  <div id="response"></div>
+
+</div>
+```
+
+  </main>
+
+  <script>
+
+    function openInvitation() {
+
+      const opening = document.getElementById("opening");
+      const main = document.getElementById("main");
+
+      opening.classList.add("opened");
+
+      // Wait for envelope animation
+      setTimeout(() => {
+
+        opening.classList.add("hide");
+        main.classList.add("show");
+
+        createConfetti(150);
+
+      }, 1000);
+    }
+
+
+    function acceptInvitation() {
+
+      document.getElementById("response").innerHTML =
+        "🎊 Yay! See you at the party! ❤️";
+
+      createConfetti(200);
+    }
+
+
+    function createConfetti(amount = 100) {
+
+      const colors = [
+        "#ff0000",
+        "#ffff00",
+        "#00ff99",
+        "#00ccff",
+        "#ff00ff",
+        "#ffffff",
+        "#ff8800"
+      ];
+
+      for (let i = 0; i < amount; i++) {
+
+        const piece = document.createElement("div");
+
+        piece.className = "confetti";
+
+        piece.style.left =
+          Math.random() * 100 + "vw";
+
+        piece.style.background =
+          colors[Math.floor(Math.random() * colors.length)];
+
+        piece.style.width =
+          Math.random() * 8 + 5 + "px";
+
+        piece.style.height =
+          Math.random() * 12 + 5 + "px";
+
+        piece.style.borderRadius =
+          Math.random() > 0.5 ? "50%" : "2px";
+
+        piece.style.animationDuration =
+          Math.random() * 3 + 2 + "s";
+
+        piece.style.animationDelay =
+          Math.random() * 0.5 + "s";
+
+        document.body.appendChild(piece);
+
+        setTimeout(() => {
+          piece.remove();
+        }, 6000);
+      }
+    }
+
+  </script>
+
+</body>
+</html>
